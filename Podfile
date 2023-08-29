@@ -7,4 +7,5 @@ target 'PhotoLibrary' do
 
   # Pods for PhotoLibrary
 pod 'SDWebImage', '~> 5.0'
+pod 'XServiceLocator'
 end

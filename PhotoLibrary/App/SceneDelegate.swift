@@ -24,6 +24,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.frame = UIScreen.main.bounds
         window.makeKeyAndVisible()
         self.window = window
+        registerObjects()
+        
+    }
+    
+    private func registerObjects() {
+        let camera = CameraService()
+        register(camera, for: CameraService.self)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

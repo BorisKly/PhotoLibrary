@@ -1,16 +1,17 @@
 //
-//  PhotosCell.swift
+//  PicturesCell.swift
 //  PhotoLibrary
 //
-//  Created by Borys Klykavka on 31.07.2023.
+//  Created by Borys Klykavka on 29.08.2023.
 //
+
 
 import UIKit
 import SDWebImage
 
-class PhotosCell: UICollectionViewCell {
+class PicturesCell: UICollectionViewCell {
    
-    static let reuseId = "PhotosCell"
+    static let reuseId = "PictureCell"
     
     let photoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -31,9 +32,11 @@ class PhotosCell: UICollectionViewCell {
     var unsplashPhoto: UnsplashPhoto! {
         didSet {
             let photoUrl = unsplashPhoto.urls["regular"]
-            guard let imageUrl = photoUrl, let url = URL(string: imageUrl) else {return}
+            guard let imageUrl = photoUrl,
+                  let url = URL(string: imageUrl) else {
+                return
+            }
             photoImageView.sd_setImage(with: url)
-            
         }
     }
     
@@ -51,7 +54,7 @@ class PhotosCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        updateSelectedState() 
+        updateSelectedState()
         setupPhotoImageView()
         setupCkeckMarkImageView()
     }

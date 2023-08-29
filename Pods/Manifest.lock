@@ -2,17 +2,21 @@ PODS:
   - SDWebImage (5.17.0):
     - SDWebImage/Core (= 5.17.0)
   - SDWebImage/Core (5.17.0)
+  - XServiceLocator (1.0.0)
 
 DEPENDENCIES:
   - SDWebImage (~> 5.0)
+  - XServiceLocator
 
 SPEC REPOS:
   trunk:
     - SDWebImage
+    - XServiceLocator
 
 SPEC CHECKSUMS:
   SDWebImage: 750adf017a315a280c60fde706ab1e552a3ae4e9
+  XServiceLocator: c4dd6ec44fc0c9205326f230d21e890d077e806c
 
-PODFILE CHECKSUM: 87cb372883e849eaa80ae769f5922d82c2c47d9b
+PODFILE CHECKSUM: af97d826d5a7395cd19c30f6591ba4398b69187c
 
 COCOAPODS: 1.12.1

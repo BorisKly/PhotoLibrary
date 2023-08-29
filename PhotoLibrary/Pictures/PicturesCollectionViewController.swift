@@ -1,22 +1,26 @@
 //
-//  PhotosCollectionViewController.swift
+//  PicturesCollectionViewController.swift
 //  PhotoLibrary
 //
-//  Created by Borys Klykavka on 30.07.2023.
+//  Created by Borys Klykavka on 29.08.2023.
 //
 
-import UIKit
 
-class PhotosCollectionViewController: UICollectionViewController {
+import UIKit
+import CoreImage
+
+class PicturesCollectionViewController: UICollectionViewController {
   
     var networkDataFetcher = NetworkDataFetcher()
+   
     private var timer: Timer?
     
-    private var photos = [UnsplashPhoto]()
+    private var pictures = [UnsplashPhoto]()
     
     private var selectedImages = [UIImage]()
     
     private let itemsPerRow: CGFloat = 2
+   
     private let sectionInserts = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
     
     private lazy var addBarButtonItem: UIBarButtonItem = {
@@ -32,8 +36,8 @@ class PhotosCollectionViewController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.backgroundColor = .systemOrange
-       
+        collectionView.backgroundColor = Colors.primaryColor
+        
         updateNavButtonsState()
         setupNavigationBar()
         setupCollectionView()
@@ -44,6 +48,7 @@ class PhotosCollectionViewController: UICollectionViewController {
         addBarButtonItem.isEnabled = numberOfSelectedPhotos > 0
         actionBarButtonItem.isEnabled = numberOfSelectedPhotos > 0
     }
+    
     func refresh() {
         self.selectedImages.removeAll()
         self.collectionView.selectItem(at: nil, animated: true, scrollPosition: [])
@@ -65,6 +70,7 @@ class PhotosCollectionViewController: UICollectionViewController {
                 self.refresh()
             }
         }
+        
         shareController.popoverPresentationController?.barButtonItem = sender
         shareController.popoverPresentationController?.permittedArrowDirections = .any
         present(shareController, animated: true)
@@ -73,20 +79,18 @@ class PhotosCollectionViewController: UICollectionViewController {
     // MARK: - Setup UI Elements
     
     private func setupCollectionView() {
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "CellId")
-        collectionView.register(PhotosCell.self, forCellWithReuseIdentifier: PhotosCell.reuseId)
-        
+        collectionView.register(PicturesCell.self, forCellWithReuseIdentifier: PicturesCell.reuseId)
         collectionView.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         collectionView.contentInsetAdjustmentBehavior = .automatic
         collectionView.allowsMultipleSelection = true
     }
-
     
     private func setupNavigationBar() {
         let titleLabel = UILabel()
-        titleLabel.text = "PHOTOS"
+        titleLabel.text = "PICTURES"
         titleLabel.font = UIFont.systemFont(ofSize: 22, weight: .medium)
-        titleLabel.textColor = UIColor.systemBlue
+        titleLabel.textColor = Colors.backgroundBase
+        
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: titleLabel)
         
         navigationItem.rightBarButtonItems = [addBarButtonItem, actionBarButtonItem]
@@ -97,15 +101,6 @@ class PhotosCollectionViewController: UICollectionViewController {
         navigationItem.searchController = searchController
         
         searchController.searchBar.delegate = self
-
-        //                collectionView.addSubview(searchController.searchBar)
-        //
-        //                let searchBar = searchController.searchBar
-        //                searchBar.translatesAutoresizingMaskIntoConstraints = false
-        //                NSLayoutConstraint.activate([searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        //                                             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        //                                             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)])
-
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.obscuresBackgroundDuringPresentation = false
     }
@@ -113,21 +108,21 @@ class PhotosCollectionViewController: UICollectionViewController {
     // MARK: - UICollectionViewDataSource, UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        photos.count
+        pictures.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotosCell.reuseId, for: indexPath) as! PhotosCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PicturesCell.reuseId, for: indexPath) as! PicturesCell
        
-        let unsplashedPhoto = photos[indexPath.item]
+        let unsplashedPhoto = pictures[indexPath.item]
         cell.unsplashPhoto = unsplashedPhoto
-        cell.backgroundColor = .systemRed
+        cell.backgroundColor = .systemGreen
         return cell
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         updateNavButtonsState()
-        let cell = collectionView.cellForItem(at: indexPath) as! PhotosCell
+        let cell = collectionView.cellForItem(at: indexPath) as! PicturesCell
         guard let image = cell.photoImageView.image else {
             return
         }
@@ -136,7 +131,7 @@ class PhotosCollectionViewController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         updateNavButtonsState()
-        let cell = collectionView.cellForItem(at: indexPath) as! PhotosCell
+        let cell = collectionView.cellForItem(at: indexPath) as! PicturesCell
         guard let image = cell.photoImageView.image else {
             return
         }
@@ -148,14 +143,14 @@ class PhotosCollectionViewController: UICollectionViewController {
 
 // MARK: - UISearchBArDelegate
 
-extension PhotosCollectionViewController: UISearchBarDelegate {
+extension PicturesCollectionViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { _ in
             self.networkDataFetcher.fetchImages(searchTerm: searchText) { [weak self] searchResults in
                 guard let fetchedPhotos = searchResults else {return}
-                self?.photos = fetchedPhotos.results
+                self?.pictures = fetchedPhotos.results
                 self?.collectionView.reloadData()
                 self?.refresh()
             }
@@ -163,9 +158,10 @@ extension PhotosCollectionViewController: UISearchBarDelegate {
     }
 }
 // MARK: - UICollectionViewDelegateFlowLayout
-extension PhotosCollectionViewController: UICollectionViewDelegateFlowLayout {
+
+extension PicturesCollectionViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let photo = photos[indexPath.item]
+        let photo = pictures[indexPath.item]
         let paddingSpace = sectionInserts.left * (itemsPerRow + 1)
         let availiableWidth = view.frame.width - paddingSpace
         let widthPerItem = availiableWidth / itemsPerRow
